@@ -1,0 +1,17 @@
+﻿// Copyright (c) 2021 Ezequias Silva.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/. --%>
+using System.Collections;
+
+namespace SunEngine.Core
+{
+    public interface ISubsystem
+    {
+        World World { get; }
+        void Add(object obj, GameObject gameObject);
+        IEnumerable Get(GameObject gameObject);
+        void Remove(object obj);
+        void Remove(GameObject gameObject);
+    }
+}
