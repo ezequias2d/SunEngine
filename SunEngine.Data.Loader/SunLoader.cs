@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2021 Ezequias Silva.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/. --%>
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 using Assimp;
 using SunEngine.GL;
 using SunEngine.Data.Meshes;
@@ -107,19 +107,22 @@ namespace SunEngine.Data.Loader
                         switch (bitmap.PixelFormat)
                         {
                             case System.Drawing.Imaging.PixelFormat.Format32bppArgb:
-                                WritePixel(pixelFormat, src[p + 3], src[p + 2], src[p + 1], src[p + 0], dstPost);
+                                WritePixel(pixelFormat, *(int*)(src + p), dstPost);
                                 break;
                             case System.Drawing.Imaging.PixelFormat.Format16bppGrayScale:
-                                aux = (byte)(((src[p] * 256) + src[p + 1]) / 257);
-                                WritePixel(pixelFormat, 255, aux, aux, aux, dstPost);
+                                aux = (byte)(((src[p] * 256) + src[p + 1]) / 257);                                
+                                WritePixel(pixelFormat, aux, dstPost);
                                 break;
                             case System.Drawing.Imaging.PixelFormat.Format24bppRgb:
                             case System.Drawing.Imaging.PixelFormat.Format32bppRgb:
-                                WritePixel(pixelFormat, 255, src[p + 2], src[p + 1], src[p + 0], dstPost);
+                                if(p == 0)
+                                    WritePixel(pixelFormat, 255 << 24 | ((*(int*)(src + p) >> 8) & 0xFFFFFF), dstPost);
+                                else
+                                    WritePixel(pixelFormat, 255 << 24 | (*(int*)(src + p - 1) & 0xFFFFFF), dstPost);
                                 break;
                             case System.Drawing.Imaging.PixelFormat.Format8bppIndexed:
                                 aux = src[p];
-                                WritePixel(pixelFormat, pallet[aux].A, pallet[aux].R, pallet[aux].G, pallet[aux].B, dstPost);
+                                WritePixel(pixelFormat, pallet[aux].ToArgb(), dstPost);
                                 break;
 
                         }
@@ -133,27 +136,28 @@ namespace SunEngine.Data.Loader
             }
         }
 
-        private static unsafe int WritePixel(GL.PixelFormat pixelFormat, in byte a, in byte r, in byte g, in byte b, byte* data)
+        //private static unsafe int WritePixel(GL.PixelFormat pixelFormat, in byte a, in byte r, in byte g, in byte b, byte* data)
+        private static unsafe void WritePixel(GL.PixelFormat pixelFormat, in int color, byte* data)
         {
-            switch (pixelFormat)
+            if (BitConverter.IsLittleEndian)
             {
-                case GL.PixelFormat.Rgba:
-                    data[0] = r;
-                    data[1] = g;
-                    data[2] = b;
-                    data[3] = a;
-                    return 4;
-                case GL.PixelFormat.Rgb:
-                    data[0] = r;
-                    data[1] = g;
-                    data[2] = b;
-                    return 3;
-                case GL.PixelFormat.Red:
-                    data[0] = r;
-                    return 1;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(pixelFormat));
+                switch (pixelFormat)
+                {
+                    case GL.PixelFormat.Rgba:
+                        *(int*)data = (color & (0xFF << 24)) | ((color << 8) & 0xFF0000) | ((color >> 8) & 0xFF00) | (color & 0xFF);
+                        break;
+                    case GL.PixelFormat.Rgb:
+                        *(int*)data |= ((color << 8) & 0xFF0000) | ((color >> 8) & 0xFF00) | (color & 0xFF);
+                        break;
+                    case GL.PixelFormat.Red:
+                        *data = (byte)(color & 265);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(pixelFormat));
+                }
             }
+            else
+                throw new NotImplementedException();
         }
 
         private static int GetPixelSize(GL.PixelFormat pixelFormat)

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2021 Ezequias Silva.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/. --%>
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 using SunEngine.Core.Components;
 using SunEngine.Data;
 using SunEngine.GL;
@@ -36,7 +36,6 @@ namespace SunEngine.Core
             Framebuffer.Attach(DepthBuffer, FramebufferAttachment.DepthStencilAttachment);
 
             Framebuffer.Unbind(FramebufferTarget.Framebuffer);
-
 
             //gl.Enable(EnableCap.Multisample);
             //sampleTexture = GL.GenTexture();

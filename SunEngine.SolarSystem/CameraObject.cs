@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2021 Ezequias Silva.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at https://mozilla.org/MPL/2.0/. --%>
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 using SunEngine.Core;
 using SunEngine.Core.Components;
 using SunEngine.Graphics;
@@ -14,13 +14,7 @@ namespace SunEngine.SolarSystem
 {
     public sealed class CameraObject : IComponent
     {
-        private CameraComponent Camera { get; }
-        private World World { get; }
-        private IInput Input { get; }
-        
-        private Vector3 EulerPlanet;
-
-
+        private float _zoom;
         public CameraObject(World world, float aspectRatio)
         {
             World = world;
@@ -38,22 +32,25 @@ namespace SunEngine.SolarSystem
 
             world.DrawSubsystem.MainCamera = Camera;
 
-            Focus = CameraFocus.Free;
-            EulerPlanet = Vector3.Zero;
+            Focus = SolarObject.None;
+            _zoom = 1;
         }
-        public CameraFocus Focus { get; set; }
+        public SolarObject Focus { get; set; }
+        private CameraComponent Camera { get; }
+        private World World { get; }
+        private IInput Input { get; }
 
         private void Increment()
         {
-            if (Focus == CameraFocus.Last)
-                Focus = CameraFocus.First;
+            if (Focus == SolarObject.Last)
+                Focus = SolarObject.First;
             else
                 Focus++;
         }
         private void Decrement()
         {
-            if (Focus == CameraFocus.First)
-                Focus = CameraFocus.Last;
+            if (Focus == SolarObject.First)
+                Focus = SolarObject.Last;
             else
                 Focus--;
         }
@@ -66,7 +63,10 @@ namespace SunEngine.SolarSystem
             else if (keyboard[Key.PageDown] == KeyEvent.Down)
                 Decrement();
 
-            if(Focus == CameraFocus.Free)
+            if (keyboard[Key.End] == KeyEvent.Down)
+                Focus = SolarObject.None;
+
+            if(Focus == SolarObject.None)
                 FreeCamera(sender, e);
             else
                 PlanetFocus(Focus.ToString(), sender, e);
@@ -90,51 +90,58 @@ namespace SunEngine.SolarSystem
             if (keyboard[Key.Right] == KeyEvent.Repeat)
                 direction -= Vector3.UnitY;
 
-            sender.Rotation = SunMath.ToQuaternion(SunMath.ToEulerAngles(sender.Rotation) + direction * (float)e.Time * 45f);
+            euler += direction * (float)e.Time * 45f;
+
+            sender.Rotation = SunMath.ToQuaternion(euler);
         }
 
-        private void PlanetRotate(GameObject _, ElapsedTimeEventArgs e)
-        {
-            var keyboard = Input.GetKeyboardState();
-
-            Vector3 direction = Vector3.Zero;
-            if (keyboard[Key.Down] == KeyEvent.Repeat)
-                direction -= Vector3.UnitX;
-
-            if (keyboard[Key.Up] == KeyEvent.Repeat)
-                direction += Vector3.UnitX;
-
-            if (keyboard[Key.Left] == KeyEvent.Repeat)
-                direction += Vector3.UnitY;
-
-            if (keyboard[Key.Right] == KeyEvent.Repeat)
-                direction -= Vector3.UnitY;
-
-            EulerPlanet += direction * (float)e.Time * 90f;
-
-            EulerPlanet = new Vector3(
-                (EulerPlanet.X > 0) ? (EulerPlanet.X % 360) : (360 - (EulerPlanet.X * (-1) % 360)),
-                (EulerPlanet.Y > 0) ? (EulerPlanet.Y % 360) : (360 - (EulerPlanet.Y * (-1) % 360)),
-                (EulerPlanet.Z > 0) ? (EulerPlanet.Z % 360) : (360 - (EulerPlanet.Z * (-1) % 360)));
-
-            Console.WriteLine("EulerPlanet: " + EulerPlanet);
-        }
-
+        Vector3 euler = Vector3.Zero;
         private void PlanetFocus(string objectName, GameObject sender, ElapsedTimeEventArgs e)
         {
-            PlanetRotate(sender, e);
-
+            var keyboard = Input.GetKeyboardState();
             var planet = World.Get(objectName).FirstOrDefault();
             if (planet != null)
             {
-                Camera.Camera.NearDistance = planet.Scale.X * 0.95f;
+                Vector3 rotatedirection = Vector3.Zero;
+                if (keyboard[Key.Down] == KeyEvent.Repeat)
+                    rotatedirection -= Vector3.UnitX;
 
-                Vector3 offset = new Vector3(0, 0, 1f);
-                offset = Vector3.Transform(offset, SunMath.ToQuaternion(EulerPlanet));
-                Console.WriteLine("Offset:" + offset);
+                if (keyboard[Key.Up] == KeyEvent.Repeat)
+                    rotatedirection += Vector3.UnitX;
 
-                Camera.Position = (planet.Position + offset * planet.Scale.X * 3f + Camera.Position) / 2f;
-                Camera.Rotation = SunMath.ToQuaternion(EulerPlanet);
+                if (keyboard[Key.Left] == KeyEvent.Repeat)
+                    rotatedirection += Vector3.UnitY;
+
+                if (keyboard[Key.Right] == KeyEvent.Repeat)
+                    rotatedirection -= Vector3.UnitY;
+
+                Camera.Camera.NearDistance = planet.Scale.X * 0.9f;
+
+                {
+                    euler += rotatedirection * (float)e.Time * 90f;
+                    Camera.Rotation = Quaternion.Lerp(SunMath.ToQuaternion(euler), Camera.Rotation, 0.5f);
+                }
+
+                float min = planet.Scale.X * 4f;
+
+                if (keyboard[Key.W] == KeyEvent.Repeat)
+                    _zoom -= (float)e.Time;
+
+                if(keyboard[Key.S] == KeyEvent.Repeat)
+                    _zoom += (float)e.Time;
+
+                if (keyboard[Key.A] == KeyEvent.Down)
+                    _zoom = min;
+
+                if (keyboard[Key.D] == KeyEvent.Down)
+                    _zoom = 1f;
+
+                _zoom = Math.Max(_zoom, min);
+
+                Vector3 offset = Vector3.Transform(Vector3.UnitZ, Camera.Rotation);
+                Camera.Position = (planet.Position + offset * _zoom + Camera.Position) / 2f;
+
+
             }
             else
                 Increment();
