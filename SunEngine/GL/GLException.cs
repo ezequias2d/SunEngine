@@ -7,21 +7,21 @@ using System.Runtime.Serialization;
 
 namespace SunEngine.GL
 {
-    public class GLExpection : Exception
+    public class GLException : Exception
     {
-        public GLExpection()
+        public GLException()
         {
         }
 
-        public GLExpection(string message) : base(message)
+        public GLException(string message) : base(message)
         {
         }
 
-        public GLExpection(string message, Exception innerException) : base(message, innerException)
+        public GLException(string message, Exception innerException) : base(message, innerException)
         {
         }
 
-        protected GLExpection(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected GLException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

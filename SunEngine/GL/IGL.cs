@@ -81,7 +81,7 @@ namespace SunEngine.GL
         /// <param name="target">Specifies the target to which the buffer object is bound.</param>
         /// <param name="offset">Specifies the offset into the buffer object's data store from which data will be returned, measured in bytes.</param>
         /// <param name="data">Specifies the location where buffer object data is returned.</param>
-        /// <exception cref="GLExpection">
+        /// <exception cref="GLException">
         /// If the buffer object is currently mapped, or if offset and size together define a 
         /// range beyond the bounds of the buffer object's data store.
         /// </exception>
