@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace SunEngine.Core.Components
 {
-    public class ModelComponent : IDrawable, IComponent
+    public class ModelComponent : IDrawable
     {
         private Matrix4x4 modelMatrix;
         
@@ -50,6 +50,10 @@ namespace SunEngine.Core.Components
         public Binding ModelBinding { get; set; }
         public Binding ProjectionViewBinding { get; set; }
 
+        public void BeforeDraw(GameObject gameObject, ElapsedTimeEventArgs e)
+        {
+            modelMatrix = Matrix4x4.CreateScale(gameObject.Scale) * Matrix4x4.CreateFromQuaternion(gameObject.Rotation) * Matrix4x4.CreateTranslation(gameObject.Position);
+        }
 
         public void Draw(GameObject gameObject, ElapsedTimeEventArgs e)
         {
@@ -70,11 +74,6 @@ namespace SunEngine.Core.Components
             }
 
             Model.Draw();
-        }
-
-        public void Update(GameObject sender, ElapsedTimeEventArgs e)
-        {
-            modelMatrix = Matrix4x4.CreateScale(sender.Scale) * Matrix4x4.CreateFromQuaternion(sender.Rotation) * Matrix4x4.CreateTranslation(sender.Position);
         }
 
         public sealed class Binding

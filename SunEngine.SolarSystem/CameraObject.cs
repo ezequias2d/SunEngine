@@ -6,7 +6,10 @@ using SunEngine.Core;
 using SunEngine.Core.Components;
 using SunEngine.Graphics;
 using SunEngine.Inputs;
+using SunEngine.Windowing;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -15,14 +18,19 @@ namespace SunEngine.SolarSystem
     public sealed class CameraObject : IComponent
     {
         private float _zoom;
-        public CameraObject(World world, float aspectRatio)
+        private readonly ISunWindow _window;
+        private readonly IDictionary<SolarObject, PlanetObject> _solarObjects;
+        public CameraObject(World world, ISunWindow window, IDictionary<SolarObject, PlanetObject> solarObjects)
         {
+            _solarObjects = solarObjects;
+            _window = window;
+
             World = world;
             Input = world.Input;
 
             GameObject gameObject = world.New("CameraObject", "Camera");
             gameObject.Position = new Vector3(0, 0, 31);
-            Camera = new CameraComponent(aspectRatio);
+            Camera = new CameraComponent(_window.Dimension.Width / (float)_window.Dimension.Height);
             Camera.Camera.FieldOfView = SunMath.ToRadians(45f);
             Camera.IsPerspective = true;
             Camera.Camera.FarDistance = 50;
@@ -36,7 +44,7 @@ namespace SunEngine.SolarSystem
             _zoom = 1;
         }
         public SolarObject Focus { get; set; }
-        private CameraComponent Camera { get; }
+        internal CameraComponent Camera { get; }
         private World World { get; }
         private IInput Input { get; }
 
@@ -46,6 +54,9 @@ namespace SunEngine.SolarSystem
                 Focus = SolarObject.First;
             else
                 Focus++;
+
+            lerpValue = 0;
+            UpdateWindowTitle();
         }
         private void Decrement()
         {
@@ -53,8 +64,11 @@ namespace SunEngine.SolarSystem
                 Focus = SolarObject.Last;
             else
                 Focus--;
+
+            lerpValue = 0;
+            UpdateWindowTitle();
         }
-        public void Update(GameObject sender, ElapsedTimeEventArgs e)
+        public void LateUpdate(GameObject sender, ElapsedTimeEventArgs e)
         {
             var keyboard = Input.GetKeyboardState();
 
@@ -64,13 +78,44 @@ namespace SunEngine.SolarSystem
                 Decrement();
 
             if (keyboard[Key.End] == KeyEvent.Down)
+            {
                 Focus = SolarObject.None;
+                UpdateWindowTitle();
+            }
 
             if(Focus == SolarObject.None)
                 FreeCamera(sender, e);
             else
                 PlanetFocus(Focus.ToString(), sender, e);
-            
+        }
+
+        private void UpdateWindowTitle()
+        {
+            const string mainTitle = "Solar System";
+            if (Focus == SolarObject.None)
+                _window.Title = $"{mainTitle} - Free camera";
+            else
+            {
+                var name = Focus.ToString();
+                var planet = _solarObjects[Focus];
+                var complement = string.Empty;
+                
+                if(planet is MoonObject moon)
+                {
+                    var solarObjectName = moon.Father.SolarObject.ToString();
+                    var article = "A";
+                    if (IsVowel(solarObjectName[0]))
+                        article = "An";
+                    complement = $"({article} {solarObjectName} moon)";
+                }
+                
+                _window.Title = $"{mainTitle} - Focused in {name}{complement}";
+            }
+        }
+
+        private bool IsVowel(char c)
+        {
+            return "aeiouAEIOU".IndexOf(c) >= 0;
         }
 
         private void FreeRotate(GameObject sender, ElapsedTimeEventArgs e)
@@ -92,12 +137,15 @@ namespace SunEngine.SolarSystem
 
             euler += direction * (float)e.Time * 45f;
 
-            sender.Rotation = SunMath.ToQuaternion(euler);
+            sender.Rotation = Quaternion.Inverse(SunMath.ToQuaternion(euler));
         }
 
         Vector3 euler = Vector3.Zero;
+        float lerpValue = 0;
         private void PlanetFocus(string objectName, GameObject sender, ElapsedTimeEventArgs e)
         {
+            lerpValue = Math.Min((float)(lerpValue + e.Time), 1f);
+
             var keyboard = Input.GetKeyboardState();
             var planet = World.Get(objectName).FirstOrDefault();
             if (planet != null)
@@ -117,18 +165,16 @@ namespace SunEngine.SolarSystem
 
                 Camera.Camera.NearDistance = planet.Scale.X * 0.9f;
 
-                {
-                    euler += rotatedirection * (float)e.Time * 90f;
-                    Camera.Rotation = Quaternion.Lerp(SunMath.ToQuaternion(euler), Camera.Rotation, 0.5f);
-                }
+                euler += rotatedirection * (float)e.Time * 90f;
+
 
                 float min = planet.Scale.X * 4f;
 
                 if (keyboard[Key.W] == KeyEvent.Repeat)
-                    _zoom -= (float)e.Time;
+                    _zoom -= (float)e.Time * _zoom;
 
                 if(keyboard[Key.S] == KeyEvent.Repeat)
-                    _zoom += (float)e.Time;
+                    _zoom += (float)e.Time * _zoom;
 
                 if (keyboard[Key.A] == KeyEvent.Down)
                     _zoom = min;
@@ -137,11 +183,10 @@ namespace SunEngine.SolarSystem
                     _zoom = 1f;
 
                 _zoom = Math.Max(_zoom, min);
-
-                Vector3 offset = Vector3.Transform(Vector3.UnitZ, Camera.Rotation);
-                Camera.Position = (planet.Position + offset * _zoom + Camera.Position) / 2f;
-
-
+                
+                Vector3 offset = Vector3.Transform(Vector3.UnitZ, SunMath.ToQuaternion(euler));
+                Camera.Position = Vector3.Lerp(Camera.Position, planet.Position + offset * _zoom, lerpValue);
+                Camera.LookAt(planet.Position);
             }
             else
                 Increment();
@@ -176,8 +221,12 @@ namespace SunEngine.SolarSystem
             if (keyboard[Key.E] == KeyEvent.Repeat)
                 direction -= Vector3.UnitY;
 
-            direction = Vector3.Transform(direction, sender.Rotation);
+            direction = Vector3.Transform(direction, Quaternion.Inverse(sender.Rotation));
             sender.Position += direction * (float)e.Time;
+        }
+
+        public void Update(GameObject sender, ElapsedTimeEventArgs e)
+        {
         }
     }
 }

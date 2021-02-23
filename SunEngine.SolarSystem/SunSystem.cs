@@ -151,7 +151,6 @@ namespace SunEngine.SolarSystem
         #endregion
         internal GpuTexture SunTexture;
 
-        internal PlanetObject Sun;
         internal IDictionary<SolarObject, PlanetObject> SolarObjects;
         internal IList<PlanetRing> Rings;
 
@@ -169,87 +168,89 @@ namespace SunEngine.SolarSystem
         public void OnLoad(object sender, EventArgs e)
         {
             World = new World(GL, Window.Input, Window.Dimension);
-            CameraObject = new CameraObject(World, Window.Dimension.Width / (float)Window.Dimension.Height);
+            CameraObject = new CameraObject(World, Window, SolarObjects);
 
-            var sunTexture = LoadTexture("Resources/textures/2k_sun.jpg");
 
             #region load textures
 
             #region async load
-            var mercuryTexture = LoadTexture("Resources/textures/2k_mercury.jpg");
-            var venusTexture = LoadTexture("Resources/textures/2k_venus_surface.jpg");
-            var earthTexture = LoadTexture("Resources/textures/2k_earth_daymap.jpg");
-            var earthDarkTexture = LoadTexture("Resources/textures/2k_earth_nightmap.jpg");
-            var marsTexture = LoadTexture("Resources/textures/2k_mars.jpg");
-            var jupiterTexture = LoadTexture("Resources/textures/2k_jupiter.jpg");
-            var saturnTexture = LoadTexture("Resources/textures/2k_saturn.jpg");
-            var saturnRingTexture = LoadTexture("Resources/textures/2k_saturn_ring_alpha.png");
-            var uranusTexture = LoadTexture("Resources/textures/2k_uranus.jpg");
-            var neptuneTexture = LoadTexture("Resources/textures/2k_neptune.jpg");
-            var plutoTexture = LoadTexture("Resources/textures/2k_pluto.jpg");
+            {
+                var sunTexture = LoadTexture("Resources/textures/2k_sun.jpg");
+                var mercuryTexture = LoadTexture("Resources/textures/2k_mercury.jpg");
+                var venusTexture = LoadTexture("Resources/textures/2k_venus_surface.jpg");
+                var earthTexture = LoadTexture("Resources/textures/2k_earth_daymap.jpg");
+                var earthDarkTexture = LoadTexture("Resources/textures/2k_earth_nightmap.jpg");
+                var marsTexture = LoadTexture("Resources/textures/2k_mars.jpg");
+                var jupiterTexture = LoadTexture("Resources/textures/2k_jupiter.jpg");
+                var saturnTexture = LoadTexture("Resources/textures/2k_saturn.jpg");
+                var saturnRingTexture = LoadTexture("Resources/textures/2k_saturn_ring_alpha.png");
+                var uranusTexture = LoadTexture("Resources/textures/2k_uranus.jpg");
+                var neptuneTexture = LoadTexture("Resources/textures/2k_neptune.jpg");
+                var plutoTexture = LoadTexture("Resources/textures/2k_pluto.jpg");
 
-            var moonTexture = LoadTexture("Resources/textures/moons/2k_moon.jpg");
-            
-            var phobosTexture = LoadTexture("Resources/textures/moons/mars/phobos.png");
-            var deimosTexture = LoadTexture("Resources/textures/moons/mars/deimos.png");
+                var moonTexture = LoadTexture("Resources/textures/moons/2k_moon.jpg");
 
-            var callistoTexture = LoadTexture("Resources/textures/moons/jupiter/callisto.png");
-            var europaTexture = LoadTexture("Resources/textures/moons/jupiter/europa.png");
-            var ganymedeTexture = LoadTexture("Resources/textures/moons/jupiter/ganymede.png");
-            var ioTexture = LoadTexture("Resources/textures/moons/jupiter/io.png");
+                var phobosTexture = LoadTexture("Resources/textures/moons/mars/phobos.png");
+                var deimosTexture = LoadTexture("Resources/textures/moons/mars/deimos.png");
 
-            var dioneTexture = LoadTexture("Resources/textures/moons/saturn/dione.png");
-            var enceladusTexture = LoadTexture("Resources/textures/moons/saturn/enceladus.png");
-            var iapetusTexture = LoadTexture("Resources/textures/moons/saturn/iapetus.png");
-            var mimasTexture = LoadTexture("Resources/textures/moons/saturn/mimas.png");
-            var rheaTexture = LoadTexture("Resources/textures/moons/saturn/rhea.png");
-            var tethysTexture = LoadTexture("Resources/textures/moons/saturn/tethys.png");
-            var titanTexture = LoadTexture("Resources/textures/moons/saturn/titan.png");
+                var callistoTexture = LoadTexture("Resources/textures/moons/jupiter/callisto.png");
+                var europaTexture = LoadTexture("Resources/textures/moons/jupiter/europa.png");
+                var ganymedeTexture = LoadTexture("Resources/textures/moons/jupiter/ganymede.png");
+                var ioTexture = LoadTexture("Resources/textures/moons/jupiter/io.png");
 
-            var arielTexture = LoadTexture("Resources/textures/moons/uranus/ariel.jpg");
-            var mirandaTexture = LoadTexture("Resources/textures/moons/uranus/miranda.jpg");
-            var oberonTexture = LoadTexture("Resources/textures/moons/uranus/oberon.png");
-            var titaniaTexture = LoadTexture("Resources/textures/moons/uranus/titania.png");
-            var umbrielTexture = LoadTexture("Resources/textures/moons/uranus/umbriel.jfif");
+                var dioneTexture = LoadTexture("Resources/textures/moons/saturn/dione.png");
+                var enceladusTexture = LoadTexture("Resources/textures/moons/saturn/enceladus.png");
+                var iapetusTexture = LoadTexture("Resources/textures/moons/saturn/iapetus.png");
+                var mimasTexture = LoadTexture("Resources/textures/moons/saturn/mimas.png");
+                var rheaTexture = LoadTexture("Resources/textures/moons/saturn/rhea.png");
+                var tethysTexture = LoadTexture("Resources/textures/moons/saturn/tethys.png");
+                var titanTexture = LoadTexture("Resources/textures/moons/saturn/titan.png");
 
-            var tritonTexture = LoadTexture("Resources/textures/moons/neptune/triton.png");
+                var arielTexture = LoadTexture("Resources/textures/moons/uranus/ariel.jpg");
+                var mirandaTexture = LoadTexture("Resources/textures/moons/uranus/miranda.jpg");
+                var oberonTexture = LoadTexture("Resources/textures/moons/uranus/oberon.png");
+                var titaniaTexture = LoadTexture("Resources/textures/moons/uranus/titania.png");
+                var umbrielTexture = LoadTexture("Resources/textures/moons/uranus/umbriel.jfif");
 
-            var charonTexture = LoadTexture("Resources/textures/moons/pluto/charon.jpg");
+                var tritonTexture = LoadTexture("Resources/textures/moons/neptune/triton.png");
+
+                var charonTexture = LoadTexture("Resources/textures/moons/pluto/charon.jpg");
+                SunTexture = LoadGpuTexture(sunTexture);
+                MercuryTexture = LoadGpuTexture(mercuryTexture);
+                VenusTexture = LoadGpuTexture(venusTexture);
+                EarthTexture = LoadGpuTexture(earthTexture);
+                EarthDarkTexture = LoadGpuTexture(earthDarkTexture);
+                MarsTexture = LoadGpuTexture(marsTexture);
+                JupiterTexture = LoadGpuTexture(jupiterTexture);
+                SaturnTexture = LoadGpuTexture(saturnTexture);
+                SaturnRingTexture = LoadGpuTexture(saturnRingTexture);
+                UranusTexture = LoadGpuTexture(uranusTexture);
+                NeptuneTexture = LoadGpuTexture(neptuneTexture);
+                PlutoTexture = LoadGpuTexture(plutoTexture);
+                MoonTexture = LoadGpuTexture(moonTexture);
+                PhobosTexture = LoadGpuTexture(phobosTexture);
+                DeimosTexture = LoadGpuTexture(deimosTexture);
+                CallistoTexture = LoadGpuTexture(callistoTexture);
+                EuropaTexture = LoadGpuTexture(europaTexture);
+                GanymedeTexture = LoadGpuTexture(ganymedeTexture);
+                IoTexture = LoadGpuTexture(ioTexture);
+                DioneTexture = LoadGpuTexture(dioneTexture);
+                EnceladusTexture = LoadGpuTexture(enceladusTexture);
+                IapetusTexture = LoadGpuTexture(iapetusTexture);
+                MimasTexture = LoadGpuTexture(mimasTexture);
+                RheaTexture = LoadGpuTexture(rheaTexture);
+                TethysTexture = LoadGpuTexture(tethysTexture);
+                TitanTexture = LoadGpuTexture(titanTexture);
+                ArielTexture = LoadGpuTexture(arielTexture);
+                MirandaTexture = LoadGpuTexture(mirandaTexture);
+                OberonTexture = LoadGpuTexture(oberonTexture);
+                TitaniaTexture = LoadGpuTexture(titaniaTexture);
+                UmbrielTexture = LoadGpuTexture(umbrielTexture);
+                TritonTexture = LoadGpuTexture(tritonTexture);
+                CharonTexture = LoadGpuTexture(charonTexture);
+            }
             #endregion
 
-            SunTexture = LoadGpuTexture(sunTexture);
-            MercuryTexture = LoadGpuTexture(mercuryTexture);
-            VenusTexture = LoadGpuTexture(venusTexture);
-            EarthTexture = LoadGpuTexture(earthTexture);
-            EarthDarkTexture = LoadGpuTexture(earthDarkTexture);
-            MarsTexture = LoadGpuTexture(marsTexture);
-            JupiterTexture = LoadGpuTexture(jupiterTexture);
-            SaturnTexture = LoadGpuTexture(saturnTexture);
-            SaturnRingTexture = LoadGpuTexture(saturnRingTexture);
-            UranusTexture = LoadGpuTexture(uranusTexture);
-            NeptuneTexture = LoadGpuTexture(neptuneTexture);
-            PlutoTexture = LoadGpuTexture(plutoTexture);
-            MoonTexture = LoadGpuTexture(moonTexture);
-            PhobosTexture = LoadGpuTexture(phobosTexture);
-            DeimosTexture = LoadGpuTexture(deimosTexture);
-            CallistoTexture = LoadGpuTexture(callistoTexture);
-            EuropaTexture = LoadGpuTexture(europaTexture);
-            GanymedeTexture = LoadGpuTexture(ganymedeTexture);
-            IoTexture = LoadGpuTexture(ioTexture);
-            DioneTexture = LoadGpuTexture(dioneTexture);
-            EnceladusTexture = LoadGpuTexture(enceladusTexture);
-            IapetusTexture = LoadGpuTexture(iapetusTexture);
-            MimasTexture = LoadGpuTexture(mimasTexture);
-            RheaTexture = LoadGpuTexture(rheaTexture);
-            TethysTexture = LoadGpuTexture(tethysTexture);
-            TitanTexture = LoadGpuTexture(titanTexture);
-            ArielTexture = LoadGpuTexture(arielTexture);
-            MirandaTexture = LoadGpuTexture(mirandaTexture);
-            OberonTexture = LoadGpuTexture(oberonTexture);
-            TitaniaTexture = LoadGpuTexture(titaniaTexture);
-            UmbrielTexture = LoadGpuTexture(umbrielTexture);
-            TritonTexture = LoadGpuTexture(tritonTexture);
-            CharonTexture = LoadGpuTexture(charonTexture);
             #endregion
 
             SunShader = LoadShader("Resources/shaders/diffuse.vert.glsl", "Resources/shaders/sun.frag.glsl");
@@ -686,18 +687,22 @@ namespace SunEngine.SolarSystem
 
             #endregion
 
-            Sun = new PlanetObject(SolarObject.Sun, World, Sphere, SunShader, "Matrices", "Model", SunTexture)
+            SolarObjects.Add(new PlanetObject(SolarObject.Sun, World, Sphere, SunShader, "Matrices", "Model", SunTexture)
             {
                 PlanetSize = (float)ToAU(696340.0),
                 Scale = _scale,
                 AxialTilt = 7.25f,
                 RotationHours = 609.12f
-            };
+            });
+            
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         public void OnUpdate(object sender, ElapsedTimeEventArgs e)
         {
             World.ComponentSubsystem.Update(null, e);
+            World.ComponentSubsystem.LateUpdate(null, e);
         }
 
         public void OnRenderFrame(object sender, ElapsedTimeEventArgs e)
@@ -707,6 +712,7 @@ namespace SunEngine.SolarSystem
 
             GL.Clear(ClearMask.ColorBufferBit | ClearMask.DepthBufferBit);
 
+            World.DrawSubsystem.BeforeDraw(null, e);
             World.DrawSubsystem.Draw(null, e);
 
             Window.SwapBuffers();

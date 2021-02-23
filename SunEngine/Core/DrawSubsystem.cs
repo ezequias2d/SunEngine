@@ -55,9 +55,20 @@ namespace SunEngine.Core
 
         public void Draw(GameObject _, ElapsedTimeEventArgs e)
         {
-            Matrices.View = MainCamera.Camera.CreateView();
+            foreach (var pair in this)
+                pair.Key.Draw(World.Get(pair.Value), e);
+        }
+
+        public void Dispose()
+        {
             
-            if(MainCamera.IsPerspective)
+        }
+
+        public void BeforeDraw(GameObject gameObject, ElapsedTimeEventArgs e)
+        {
+            Matrices.View = MainCamera.Camera.CreateView();
+
+            if (MainCamera.IsPerspective)
                 Matrices.Projection = MainCamera.Camera.CreatePerspective();
             else
                 Matrices.Projection = MainCamera.Camera.CreateOthograph();
@@ -69,12 +80,7 @@ namespace SunEngine.Core
             }
 
             foreach (var pair in this)
-                pair.Key.Draw(World.Get(pair.Value), e);
-        }
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
+                pair.Key.BeforeDraw(World.Get(pair.Value), e);
         }
 
         public struct WorldViewMatrices

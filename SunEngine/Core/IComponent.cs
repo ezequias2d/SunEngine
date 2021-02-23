@@ -9,5 +9,6 @@ namespace SunEngine.Core
     public interface IComponent
     {
         void Update(GameObject sender, ElapsedTimeEventArgs e);
+        void LateUpdate(GameObject sender, ElapsedTimeEventArgs e);
     }
 }

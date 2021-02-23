@@ -13,6 +13,12 @@ namespace SunEngine.Core
 
         }
 
+        public void LateUpdate(GameObject sender, ElapsedTimeEventArgs e)
+        {
+            foreach (var pair in this)
+                pair.Key.LateUpdate(World.Get(pair.Value), e);
+        }
+
         public void Update(GameObject sender, ElapsedTimeEventArgs e)
         {
             foreach(var pair in this)

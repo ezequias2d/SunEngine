@@ -83,7 +83,6 @@ namespace SunEngine.SolarSystem
             RotationHours = 1;
 
             //525600 => 1 year per 1 minute.
-            TimeRate = 525600;
             TimeRate = 1;
         }
         
@@ -252,6 +251,11 @@ namespace SunEngine.SolarSystem
         {
             Quaternion rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, angle * SunMath.Deg2RadF);
             return (Vector3.Transform(Vector3.UnitY, rotation), rotation);
+        }
+
+        public void LateUpdate(GameObject sender, ElapsedTimeEventArgs e)
+        {
+            
         }
     }
 }

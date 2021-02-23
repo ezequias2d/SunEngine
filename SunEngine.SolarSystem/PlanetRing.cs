@@ -27,6 +27,11 @@ namespace SunEngine.SolarSystem
 
         public PlanetObject PlanetObject { get; }
 
+        public void LateUpdate(GameObject sender, ElapsedTimeEventArgs e)
+        {
+            
+        }
+
         public void Update(GameObject sender, ElapsedTimeEventArgs e)
         {
             sender.Position = new Vector3((float)PlanetObject.Position.X, (float)PlanetObject.Position.Y, (float)PlanetObject.Position.Z);

@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace SunEngine.Core.Components
 {
-    public class CameraComponent : IComponent
+    public class CameraComponent : IDrawable
     {
         public CameraComponent(float aspectRatio)
         {
@@ -30,7 +30,7 @@ namespace SunEngine.Core.Components
         public bool cameraToGameObject;
         public bool IsPerspective;
 
-        public void Update(GameObject sender, ElapsedTimeEventArgs e)
+        public void BeforeDraw(GameObject sender, ElapsedTimeEventArgs e)
         {
             if (cameraToGameObject)
             {
@@ -49,6 +49,11 @@ namespace SunEngine.Core.Components
         {
             Camera.LookAt(target);
             cameraToGameObject = true;
+        }
+
+        public void Draw(GameObject gameObject, ElapsedTimeEventArgs e)
+        {
+            
         }
 
         public Vector3 Position 

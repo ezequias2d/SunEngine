@@ -8,6 +8,7 @@ namespace SunEngine.Core
 {
     public interface IDrawable
     {
+        void BeforeDraw(GameObject gameObject, ElapsedTimeEventArgs e);
         void Draw(GameObject gameObject, ElapsedTimeEventArgs e);
     }
 }
