@@ -76,7 +76,7 @@ namespace SunEngine.Data
 
             //return Matrix4x4.CreateLookAt(Position, Position + cameraFront, Up);
             return Matrix4x4.CreateTranslation(-Position) *
-                Matrix4x4.CreateFromQuaternion(Quaternion.Inverse(Rotation));
+                Matrix4x4.CreateFromQuaternion(Rotation);
         }
 
         public Matrix4x4 CreatePerspective() => Matrix4x4.CreatePerspectiveFieldOfView(FieldOfView, AspectRatio, NearDistance, FarDistance);
