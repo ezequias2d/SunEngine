@@ -722,6 +722,12 @@ namespace SunEngine.SolarSystem
             CameraObject.Camera.Camera.AspectRatio = size.Width / (float)size.Height;
         }
 
+        public void SetTimeRate(double timeRate)
+        {
+            foreach (var obj in SolarObjects.Values)
+                obj.TimeRate = timeRate;
+        }
+
         private Model LoadModel(string path)
         {
             using (var stream = File.OpenRead(path))           

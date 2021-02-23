@@ -20,6 +20,7 @@ namespace SunEngine.SolarSystem
             _planet = planet;
         }
 
+        public PlanetObject Father => _planet;
         public override (double X, double Y, double Z) Center { get => _planet.Position; set => _planet.Position = value; }
 
         public override void Update(GameObject sender, ElapsedTimeEventArgs e)

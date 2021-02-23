@@ -5,6 +5,7 @@
 using SunEngine.GL;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace SunEngine.Graphics
@@ -26,7 +27,7 @@ namespace SunEngine.Graphics
             {
                 int shaderHandle = CompileShaderProgram(program);
                 GL.AttachShader(Handle, shaderHandle);
-                Console.WriteLine("Attach Shader: " + GL.GetError());
+                GL.CheckErros();
                 shaderHandles.Add(shaderHandle);
             }
 
@@ -36,8 +37,8 @@ namespace SunEngine.Graphics
             GL.ValidateProgram(Handle);
             GL.CheckErros();
 
-            Console.WriteLine(GL.GetProgramInfoLog(Handle));
-    
+            WriteProgramInfoLog();
+
             foreach (int shaderHandle in shaderHandles)
             {
                 GL.DetachShader(Handle, shaderHandle);
@@ -46,6 +47,12 @@ namespace SunEngine.Graphics
                 GL.DeleteShader(shaderHandle);
                 GL.CheckErros();
             }
+        }
+
+        [Conditional("DEBUG")]
+        private void WriteProgramInfoLog()
+        {
+            Console.WriteLine(GL.GetProgramInfoLog(Handle));
         }
 
         private int CompileShaderProgram(ShaderProgram program)
