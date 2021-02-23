@@ -40,7 +40,8 @@ namespace SunEngine
                 PreferredDepthBufferBits = 32,
                 PreferredStencilBufferBits = -1,
             });
-            
+
+            GL = new GLWrapper(_window);
 
             _window.Load += () => 
             {
@@ -59,7 +60,11 @@ namespace SunEngine
                 RenderFrame?.Invoke(this, new ElapsedTimeEventArgs(elapsed));
             };
 
-            GL = new GLWrapper(_window);            
+            _window.Resize += (size) =>
+            {
+                GL.Viewport(new Rectangle(0, 0, size.X, size.Y));
+                Resize?.Invoke(this, new Size(size.X, size.Y));
+            };
         }
 
 
@@ -77,6 +82,11 @@ namespace SunEngine
         public EventHandler<ElapsedTimeEventArgs> RenderFrame { get; set; }
 
         public IInput Input => _input;
+
+        public EventHandler<Size> Resize { get; set; }
+
+        public void Close() =>
+            _window.Close();
 
         public void Run() =>
             _window.Run();

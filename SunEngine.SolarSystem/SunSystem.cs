@@ -717,6 +717,10 @@ namespace SunEngine.SolarSystem
 
             Window.SwapBuffers();
         }
+        public void OnResize(object _, Size size)
+        {
+            CameraObject.Camera.Camera.AspectRatio = size.Width / (float)size.Height;
+        }
 
         private Model LoadModel(string path)
         {

@@ -25,8 +25,11 @@ namespace SunEngine.Windowing
         EventHandler Load { get; set; }
         EventHandler<ElapsedTimeEventArgs> Update { get; set; }
         EventHandler<ElapsedTimeEventArgs> RenderFrame { get; set; }
+        EventHandler<Size> Resize { get; set; }
 
         void Run();
         void SwapBuffers();
+
+        void Close();
     }
 }
