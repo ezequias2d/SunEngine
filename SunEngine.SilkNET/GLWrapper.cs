@@ -275,5 +275,7 @@ namespace SunEngine
             }
         }
 
+        public void Viewport(Rectangle viewport) =>
+            _gl.Viewport(viewport);
     }
 }

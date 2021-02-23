@@ -441,5 +441,9 @@ namespace SunEngine.GL
 
         void Enable(EnableCap cap);
         #endregion
+
+        #region settings
+        void Viewport(Rectangle viewport);
+        #endregion
     }
 }
