@@ -156,9 +156,11 @@ namespace SunEngine.SolarSystem
 
         internal CameraObject CameraObject;
         internal readonly float _scale;
-        public SunSystem(ISunWindow window, float scale = 50f)
+        internal readonly double _timeRate;
+        public SunSystem(ISunWindow window, float scale = 50f, double timeRate = 1f)
         {
             _scale = scale;
+            _timeRate = timeRate;
             Window = window;
             GL = window.GL;
             SolarObjects = new Dictionary<SolarObject, PlanetObject>();
@@ -262,6 +264,7 @@ namespace SunEngine.SolarSystem
             #region planets
             SolarObjects.Add(new PlanetObject(SolarObject.Mercury, World, Sphere, DiffuseShader, "Matrices", "Model", MercuryTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(2439.7),
                 Scale = _scale,
                 SemiMajorAxis = (0.38709927, 0.00000037),
@@ -276,6 +279,7 @@ namespace SunEngine.SolarSystem
 
             SolarObjects.Add(new PlanetObject(SolarObject.Venus, World, Sphere, DiffuseShader, "Matrices", "Model", VenusTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(6051.8),
                 Scale = _scale,
                 SemiMajorAxis = (0.72333566, 0.0000039),
@@ -290,6 +294,7 @@ namespace SunEngine.SolarSystem
 
             SolarObjects.Add(new PlanetObject(SolarObject.Earth, World, Sphere, DiffuseDarkShader, "Matrices", "Model", EarthTexture, EarthDarkTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(6371.0),
                 Scale = _scale,
                 SemiMajorAxis = (1.00000261, 0.00000562),
@@ -304,6 +309,7 @@ namespace SunEngine.SolarSystem
 
             SolarObjects.Add(new PlanetObject(SolarObject.Mars, World, Sphere, DiffuseShader, "Matrices", "Model", MarsTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(3389.5),
                 Scale = _scale,
                 SemiMajorAxis = (1.52371034, 0.00001847),
@@ -318,6 +324,7 @@ namespace SunEngine.SolarSystem
 
             SolarObjects.Add(new PlanetObject(SolarObject.Jupiter, World, Sphere, DiffuseShader, "Matrices", "Model", JupiterTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(96911),
                 Scale = _scale,
                 SemiMajorAxis = (5.202887, -0.00011607),
@@ -332,6 +339,7 @@ namespace SunEngine.SolarSystem
 
             SolarObjects.Add(new PlanetObject(SolarObject.Saturn, World, Sphere, DiffuseShader, "Matrices", "Model", SaturnTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(58232),
                 Scale = _scale,
                 SemiMajorAxis = (9.53667594, -0.00125060),
@@ -394,6 +402,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Earth], SolarObject.Moon,
                 World, Sphere, DiffuseShader, "Matrices", "Model", MoonTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(1737.1),
                 SemiMajorAxis = (ToAU(384400), 0),
                 Eccentricity = (0.0554, 0),
@@ -408,6 +417,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Mars], SolarObject.Phobos,
                 World, Sphere, DiffuseShader, "Matrices", "Model", PhobosTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(11.267),
                 SemiMajorAxis = (ToAU(9376), 0),
                 Eccentricity = (0.0151, 0),
@@ -422,6 +432,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Mars], SolarObject.Deimos,
                World, Sphere, DiffuseShader, "Matrices", "Model", DeimosTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(6.2),
                 SemiMajorAxis = (ToAU(23458), 0),
                 Eccentricity = (0.0002, 0),
@@ -436,6 +447,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Jupiter], SolarObject.Callisto,
                 World, Sphere, DiffuseShader, "Matrices", "Model", CallistoTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(2410.3),
                 SemiMajorAxis = (ToAU(1_882_700), 0),
                 Eccentricity = (0.0074, 0),
@@ -450,6 +462,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Jupiter], SolarObject.Europa,
                 World, Sphere, DiffuseShader, "Matrices", "Model", EuropaTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(1560.8),
                 SemiMajorAxis = (ToAU(671_100), 0),
                 Eccentricity = (0.0094, 0),
@@ -464,6 +477,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Jupiter], SolarObject.Ganymede,
                 World, Sphere, DiffuseShader, "Matrices", "Model", GanymedeTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(2634.1),
                 SemiMajorAxis = (ToAU(1_070_400), 0),
                 Eccentricity = (0.0013, 0),
@@ -478,6 +492,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Jupiter], SolarObject.Io,
                 World, Sphere, DiffuseShader, "Matrices", "Model", IoTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(1821.6),
                 SemiMajorAxis = (ToAU(421_800), 0),
                 Eccentricity = (0.0041, 0),
@@ -492,6 +507,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Saturn], SolarObject.Dione,
                 World, Sphere, DiffuseShader, "Matrices", "Model", DioneTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(561.4),
                 SemiMajorAxis = (ToAU(377_415), 0),
                 Eccentricity = (0.0022, 0),
@@ -506,6 +522,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Saturn], SolarObject.Enceladus,
                 World, Sphere, DiffuseShader, "Matrices", "Model", EnceladusTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(252.1),
                 SemiMajorAxis = (ToAU(238_042), 0),
                 Eccentricity = (0, 0),
@@ -520,6 +537,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Saturn], SolarObject.Iapetus,
                 World, Sphere, DiffuseShader, "Matrices", "Model", IapetusTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(734.5),
                 SemiMajorAxis = (ToAU(3_560_854), 0),
                 Eccentricity = (0.0293, 0),
@@ -534,6 +552,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Saturn], SolarObject.Mimas,
                 World, Sphere, DiffuseShader, "Matrices", "Model", MimasTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(396.4),
                 SemiMajorAxis = (ToAU(185_539), 0),
                 Eccentricity = (0.0196, 0),
@@ -548,6 +567,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Saturn], SolarObject.Rhea,
                 World, Sphere, DiffuseShader, "Matrices", "Model", RheaTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(763.8),
                 SemiMajorAxis = (ToAU(527_068), 0),
                 Eccentricity = (0.0002, 0),
@@ -562,6 +582,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Saturn], SolarObject.Tethys,
                 World, Sphere, DiffuseShader, "Matrices", "Model", TethysTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(531),
                 SemiMajorAxis = (ToAU(294_672), 0),
                 Eccentricity = (0.0001, 0),
@@ -576,6 +597,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Saturn], SolarObject.Titan,
                 World, Sphere, DiffuseShader, "Matrices", "Model", TitanTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(2574.7),
                 SemiMajorAxis = (ToAU(1_221_865), 0),
                 Eccentricity = (0.0288, 0),
@@ -590,6 +612,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Uranus], SolarObject.Ariel,
                 World, Sphere, DiffuseShader, "Matrices", "Model", ArielTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(578.9),
                 SemiMajorAxis = (ToAU(190_900), 0),
                 Eccentricity = (0.0012, 0),
@@ -604,6 +627,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Uranus], SolarObject.Miranda,
                 World, Sphere, DiffuseShader, "Matrices", "Model", MirandaTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(235.8),
                 SemiMajorAxis = (ToAU(129_900), 0),
                 Eccentricity = (0.0013, 0),
@@ -618,6 +642,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Uranus], SolarObject.Oberon,
                 World, Sphere, DiffuseShader, "Matrices", "Model", OberonTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(761.4),
                 SemiMajorAxis = (ToAU(583_500), 0),
                 Eccentricity = (0.0014, 0),
@@ -632,6 +657,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Uranus], SolarObject.Titania,
                 World, Sphere, DiffuseShader, "Matrices", "Model", TitaniaTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(788.4),
                 SemiMajorAxis = (ToAU(436_300), 0),
                 Eccentricity = (0.0011, 0),
@@ -646,6 +672,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Uranus], SolarObject.Umbriel,
                 World, Sphere, DiffuseShader, "Matrices", "Model", UmbrielTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(584.7),
                 SemiMajorAxis = (ToAU(266_000), 0),
                 Eccentricity = (0.0039, 0),
@@ -660,6 +687,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Neptune], SolarObject.Triton,
                 World, Sphere, DiffuseShader, "Matrices", "Model", TritonTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(1353.4),
                 SemiMajorAxis = (ToAU(354_759), 0),
                 Eccentricity = (0, 0),
@@ -674,6 +702,7 @@ namespace SunEngine.SolarSystem
             SolarObjects.Add(new MoonObject(SolarObjects[SolarObject.Pluto], SolarObject.Charon,
                 World, Sphere, DiffuseShader, "Matrices", "Model", CharonTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(606),
                 SemiMajorAxis = (ToAU(19_591), 0),
                 Eccentricity = (0.0002, 0),
@@ -689,6 +718,7 @@ namespace SunEngine.SolarSystem
 
             SolarObjects.Add(new PlanetObject(SolarObject.Sun, World, Sphere, SunShader, "Matrices", "Model", SunTexture)
             {
+                TimeRate = _timeRate,
                 PlanetSize = (float)ToAU(696340.0),
                 Scale = _scale,
                 AxialTilt = 7.25f,
@@ -707,7 +737,7 @@ namespace SunEngine.SolarSystem
 
         public void OnRenderFrame(object sender, ElapsedTimeEventArgs e)
         {
-            GL.ClearColor(Color.FromArgb(0, 9, 11));
+            GL.ClearColor(Color.FromArgb(23, 29, 31));
             GL.Enable(EnableCap.DepthTest);
 
             GL.Clear(ClearMask.ColorBufferBit | ClearMask.DepthBufferBit);
@@ -726,6 +756,13 @@ namespace SunEngine.SolarSystem
         {
             foreach (var obj in SolarObjects.Values)
                 obj.TimeRate = timeRate;
+        }
+
+        public void SetScales(float scale)
+        {
+            foreach (var obj in SolarObjects.Values)
+                if(!(obj is MoonObject))
+                    obj.Scale = scale;
         }
 
         private Model LoadModel(string path)

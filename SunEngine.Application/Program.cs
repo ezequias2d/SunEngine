@@ -14,8 +14,13 @@ namespace SunEngine.Application
     {
         static SunSystem SunSystem;
         static ISunWindow Window;
+        static float currentScale;
+        static double currentTimeRate;
         static void Main(string[] _)
         {
+            currentScale = 50f;
+            currentTimeRate = 1f;
+
             var description = SunWindowDescription.Default;
             description.Size = new Size(640, 480);
             description.VSync = true;
@@ -25,7 +30,7 @@ namespace SunEngine.Application
             Thread menuThread = new Thread(Menu);
             menuThread.IsBackground = true;
 
-            SunSystem = new SunSystem(Window);
+            SunSystem = new SunSystem(Window, currentScale);
 
             Window.Load += SunSystem.OnLoad;
             Window.Update += SunSystem.OnUpdate;
@@ -45,6 +50,8 @@ namespace SunEngine.Application
                 Console.WriteLine("0 - Exit");
                 Console.WriteLine("1 - Set resolution");
                 Console.WriteLine("2 - Set time rate");
+                Console.WriteLine("3 - Set celestial scale.");
+                Console.WriteLine("4 - Help");
 
                 Console.Write(">");
 
@@ -58,20 +65,16 @@ namespace SunEngine.Application
                             flag = false;
                             break;
                         case 1:
-                            {
-                                Console.WriteLine("Inputs resolution in format 'width height'");
-                                Console.Write(">");
-                                var aux = Console.ReadLine().Split(' ');
-                                Window.Dimension = new Size(int.Parse(aux[0]), int.Parse(aux[1]));
-                            }
+                            SetResolution();
                             break;
                         case 2:
-                            {
-                                Console.WriteLine("Inputs in seconds the time rate to update the solar system.");
-                                Console.Write(">");
-                                var aux = int.Parse(Console.ReadLine());
-                                SunSystem.SetTimeRate(aux);
-                            }
+                            SetTimeRate();
+                            break;
+                        case 3:
+                            SetScales();
+                            break;
+                        case 4:
+                            Help();
                             break;
                     }
                 }
@@ -80,6 +83,51 @@ namespace SunEngine.Application
                     Console.WriteLine(e.Message);
                 }
             }
+        }
+
+        private static void SetResolution()
+        {
+            Console.WriteLine("Input is a resolution in format 'width height'");
+            Console.WriteLine($"(Current resolution: {Window.Dimension})");
+            Console.Write(">");
+            var aux = Console.ReadLine().Split(' ');
+            Window.Dimension = new Size(int.Parse(aux[0]), int.Parse(aux[1]));
+        }
+
+        private static void SetTimeRate()
+        {
+            Console.WriteLine("Input is in seconds the rate of time to update the solar system.");
+            Console.WriteLine($"(Current TimeRate {currentTimeRate}) (525600 to simulate 1 year per 1 minute.)");
+            Console.Write(">");
+            currentTimeRate = double.Parse(Console.ReadLine());
+            SunSystem.SetTimeRate(currentTimeRate);
+        }
+
+        private static void SetScales()
+        {
+            Console.WriteLine("Inputs is the scale of celestial bodies.");
+            Console.WriteLine($"(Current: {currentScale})");
+            Console.Write(">");
+            currentScale = float.Parse(Console.ReadLine());
+            SunSystem.SetScales(currentScale);
+        }
+
+        private static void Help()
+        {
+            Console.WriteLine(@"FreeCamera mode: END
+Switch between mode focused on a celestial body / free camera: PAGE UP and PAGE DOWN.
+
+FreeCamera mode:
+    QWEASD: to move the camera along the three axes of freedom.
+    UP, DOWN, LEFT, RIGHT: Rotate camera.
+
+Focused on a celestial body:
+    W: Zoom in.
+    S: Zoom out.
+    A: Maximum zoom.
+    D: Zoom in 1 AU away.
+    UP, DOWN, LEFT, RIGHT: Rotate around the celestial body.
+");
         }
     }
 }
