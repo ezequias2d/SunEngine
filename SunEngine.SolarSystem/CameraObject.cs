@@ -31,7 +31,7 @@ namespace SunEngine.SolarSystem
             GameObject gameObject = world.New("CameraObject", "Camera");
             gameObject.Position = new Vector3(0, 0, 31);
             Camera = new CameraComponent(_window.Dimension.Width / (float)_window.Dimension.Height);
-            Camera.Camera.FieldOfView = SunMath.ToRadians(45f);
+            Camera.Camera.FieldOfView = SunMath.Deg2RadF * 45f;
             Camera.IsPerspective = true;
             Camera.Camera.FarDistance = 50;
             

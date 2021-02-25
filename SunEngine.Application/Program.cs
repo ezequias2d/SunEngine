@@ -34,8 +34,6 @@ namespace SunEngine.Application
 
             menuThread.Start();
             Window.Run();
-
-            menuThread.Join();
         }
 
         static void Menu()
@@ -48,29 +46,38 @@ namespace SunEngine.Application
                 Console.WriteLine("1 - Set resolution");
                 Console.WriteLine("2 - Set time rate");
 
-                int op = int.Parse(Console.ReadLine());
-                switch (op)
+                Console.Write(">");
+
+                try
                 {
-                    case 0:
-                        Window.Close();
-                        flag = false;
-                        break;
-                    case 1:
-                        {
-                            Console.WriteLine("Inputs resolution in format 'width height'");
-                            Console.WriteLine(">");
-                            var aux = Console.ReadLine().Split(' ');
-                            Window.Dimension = new Size(int.Parse(aux[0]), int.Parse(aux[1]));
-                        }
-                        break;
-                    case 2:
-                        {
-                            Console.WriteLine("Inputs in seconds the time rate to update the solar system.");
-                            Console.WriteLine(">");
-                            var aux = int.Parse(Console.ReadLine());
-                            SunSystem.SetTimeRate(aux);
-                        }
-                        break;
+                    int op = int.Parse(Console.ReadLine());
+                    switch (op)
+                    {
+                        case 0:
+                            Window.Close();
+                            flag = false;
+                            break;
+                        case 1:
+                            {
+                                Console.WriteLine("Inputs resolution in format 'width height'");
+                                Console.Write(">");
+                                var aux = Console.ReadLine().Split(' ');
+                                Window.Dimension = new Size(int.Parse(aux[0]), int.Parse(aux[1]));
+                            }
+                            break;
+                        case 2:
+                            {
+                                Console.WriteLine("Inputs in seconds the time rate to update the solar system.");
+                                Console.Write(">");
+                                var aux = int.Parse(Console.ReadLine());
+                                SunSystem.SetTimeRate(aux);
+                            }
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
                 }
             }
         }

@@ -38,7 +38,6 @@ namespace SunEngine.Core
 
         public IEnumerable<GameObject> GameObjects => _gameObjects.Values;
 
-
         public DrawSubsystem DrawSubsystem { get; }
         public ComponentSubsystem ComponentSubsystem { get; }
 

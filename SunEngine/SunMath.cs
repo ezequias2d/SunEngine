@@ -16,43 +16,6 @@ namespace SunEngine
         public static readonly double Deg2RadD = (Math.PI / 180d);
         public static readonly double Rad2DegD = (180d / Math.PI);
 
-        public static readonly float Epsilon = float.Epsilon;
-
-        public static float ToRadians(float degrees) => degrees * Deg2RadF;
-        public static double ToRadians(double degress) => degress * Deg2RadD;
-
-        public static Vector3 ToRadians(this Vector3 degrees) => degrees * Deg2RadF;
-
-        public static float ToDegrees(float radians) => radians * Rad2DegF;
-        public static double ToDegrees(double radians) => radians * Rad2DegD;
-
-
-        public static Vector3 ToDegrees(this Vector3 radians) => radians * Rad2DegF;
-
-        public static bool Approximately(float a, float b)
-        {
-            if (a == 0 || b == 0)
-                return Math.Abs(a - b) <= Epsilon;
-            return Math.Abs(a - b) / Math.Abs(a) <= Epsilon &&
-                Math.Abs(a - b) / Math.Abs(b) <= Epsilon;
-        }
-
-        public static int Floor(float value)
-        {
-            int i = (int)value;
-            if (i > value)
-                i--;
-            return i;
-        }
-
-        public static int Ceiling(float value)
-        {
-            int i = (int)value;
-            if (i < value)
-                i++;
-            return i;
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Round(float value)
         {

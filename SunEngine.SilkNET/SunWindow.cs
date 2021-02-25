@@ -42,6 +42,7 @@ namespace SunEngine
             });
 
             GL = new GLWrapper(_window);
+            IsClosing = false;
 
             _window.Load += () => 
             {
@@ -60,6 +61,11 @@ namespace SunEngine
                 RenderFrame?.Invoke(this, new ElapsedTimeEventArgs(elapsed));
             };
 
+            _window.Closing += () => 
+            {
+                IsClosing = true;
+            };
+
             _window.Resize += (size) =>
             {
                 GL.Viewport(new Rectangle(0, 0, size.X, size.Y));
@@ -71,6 +77,7 @@ namespace SunEngine
         public IGL GL { get; }
 
         public bool IsVisible { get => _window.IsVisible; set => _window.IsVisible = value; }
+        public bool IsClosing { get; private set; }
         public Point Position { get => _window.Position.ToPoint(); set => _window.Position = value.ToSilk(); }
         public Size Dimension { get => _window.Size.ToSize(); set => _window.Size = value.ToSilk(); }
         public double FramesPerSecond { get => _window.FramesPerSecond; set => _window.FramesPerSecond = value; }
@@ -85,8 +92,11 @@ namespace SunEngine
 
         public EventHandler<Size> Resize { get; set; }
 
-        public void Close() =>
-            _window.Close();
+        public void Close()
+        {
+            if(!IsClosing)
+                _window.Close();
+        }
 
         public void Run() =>
             _window.Run();

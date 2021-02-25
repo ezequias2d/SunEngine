@@ -15,13 +15,13 @@ namespace SunEngine.Windowing
         IGL GL { get; }
         IInput Input { get; }
         bool IsVisible { get; set; }
+        bool IsClosing { get; }
         Point Position { get; set; }
         Size Dimension { get; set; }
         double FramesPerSecond { get; set; }
         double UpdatesPerSecond { get; set; }
         bool VSync { get; set; }
         string Title { get; set; }
-
         EventHandler Load { get; set; }
         EventHandler<ElapsedTimeEventArgs> Update { get; set; }
         EventHandler<ElapsedTimeEventArgs> RenderFrame { get; set; }
@@ -29,7 +29,6 @@ namespace SunEngine.Windowing
 
         void Run();
         void SwapBuffers();
-
         void Close();
     }
 }

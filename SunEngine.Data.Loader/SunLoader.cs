@@ -136,7 +136,6 @@ namespace SunEngine.Data.Loader
             }
         }
 
-        //private static unsafe int WritePixel(GL.PixelFormat pixelFormat, in byte a, in byte r, in byte g, in byte b, byte* data)
         private static unsafe void WritePixel(GL.PixelFormat pixelFormat, in int color, byte* data)
         {
             if (BitConverter.IsLittleEndian)

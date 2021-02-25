@@ -17,7 +17,7 @@ namespace SunEngine.Core.Components
                 AspectRatio = aspectRatio,
                 NearDistance =  0.1f,
                 FarDistance = 100.0f,
-                FieldOfView = SunMath.ToRadians(60f),
+                FieldOfView = SunMath.Deg2RadF * 60f,
                 Name = "MainCamera",
                 OrthographicSize = 500f,
                 Position = Vector3.Zero,
