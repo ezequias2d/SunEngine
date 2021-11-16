@@ -13,7 +13,7 @@ using System.IO;
 using System.Numerics;
 using AssimpMesh = Assimp.Mesh;
 using SunMesh = SunEngine.Data.Meshes.Mesh;
-using System.Drawing.Imaging;
+using StbImageSharp;
 
 namespace SunEngine.Data.Loader
 {
@@ -24,139 +24,28 @@ namespace SunEngine.Data.Loader
 
         public static Texture LoadTexture(Stream stream)
         {
-            Bitmap bitmap = new Bitmap(stream);
+            StbImage.stbi_set_flip_vertically_on_load(1);
+            var image = ImageResult.FromStream(stream);
+            
             Texture texture = default;
             texture.PixelType = PixelType.UnsignedByte;
-            
-            switch(bitmap.PixelFormat)
+            switch(image.Comp)
             {
-                case System.Drawing.Imaging.PixelFormat.Format32bppArgb:
-                case System.Drawing.Imaging.PixelFormat.Format8bppIndexed:
-                    texture.PixelFormat = GL.PixelFormat.Rgba;
+                case ColorComponents.RedGreenBlue:
+                    texture.PixelFormat = PixelFormat.Rgb;
                     break;
-                case System.Drawing.Imaging.PixelFormat.Format24bppRgb:
-                case System.Drawing.Imaging.PixelFormat.Format32bppRgb:
-                    texture.PixelFormat = GL.PixelFormat.Rgb;
+                case ColorComponents.RedGreenBlueAlpha:
+                    texture.PixelFormat = PixelFormat.Rgba;
                     break;
-                case System.Drawing.Imaging.PixelFormat.Format16bppGrayScale:
-                    texture.PixelFormat = GL.PixelFormat.Red;
-                    break;
-                default:
-                    throw new InvalidDataException();
             }
-
-            texture.Width = bitmap.Width;
-            texture.Height = bitmap.Height;
+            texture.Width = image.Width;
+            texture.Height = image.Height;
 
             texture.Data = new byte[GetPixelSize(texture.PixelFormat) * texture.Width * texture.Height];
 
-            ReadPixels(bitmap, texture.PixelFormat, texture.Data);
+            Array.Copy(image.Data, texture.Data, image.Data.Length);
 
             return texture;
-        }
-
-        private static unsafe void ReadPixels(Bitmap bitmap, GL.PixelFormat pixelFormat, Span<byte> dstSpan)
-        {
-            int pixelSizeDst = GetPixelSize(pixelFormat);
-
-            int pixelSizeSrc;
-            switch (bitmap.PixelFormat)
-            {
-                case System.Drawing.Imaging.PixelFormat.Format32bppRgb:
-                case System.Drawing.Imaging.PixelFormat.Format32bppArgb:
-                    pixelSizeSrc = 4;
-                    break;
-                case System.Drawing.Imaging.PixelFormat.Format16bppGrayScale:
-                    pixelSizeSrc = 2;
-                    break;
-                case System.Drawing.Imaging.PixelFormat.Format24bppRgb:
-                    pixelSizeSrc = 3;
-                    break;
-                case System.Drawing.Imaging.PixelFormat.Format8bppIndexed:
-                    pixelSizeSrc = 1;
-                    break;
-                default:
-                    throw new FormatException("PixelFormat is not supported.");
-            }
-            
-            BitmapData bmpData = default;
-            try
-            {
-                bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                                                ImageLockMode.ReadOnly,
-                                                bitmap.PixelFormat);
-                IntPtr ptr = bmpData.Scan0;
-
-                int pixels = bitmap.Width * bitmap.Height;
-
-                int width = bitmap.Width;
-                int height = bitmap.Height;
-                byte* src = (byte*)ptr.ToPointer();
-                fixed (byte* dst = dstSpan)
-                {
-                    int p;
-                    byte aux;
-                    Color[] pallet = null;
-                    if (bitmap.PixelFormat == System.Drawing.Imaging.PixelFormat.Format8bppIndexed)
-                        pallet = bitmap.Palette.Entries;
-
-                    for (int i = 0; i < pixels; i++)
-                    {
-                        p = (i % width + (height - (i / width) - 1) * width) * pixelSizeSrc;
-                        byte* dstPost = dst + i * pixelSizeDst;
-                        switch (bitmap.PixelFormat)
-                        {
-                            case System.Drawing.Imaging.PixelFormat.Format32bppArgb:
-                                WritePixel(pixelFormat, *(int*)(src + p), dstPost);
-                                break;
-                            case System.Drawing.Imaging.PixelFormat.Format16bppGrayScale:
-                                aux = (byte)(((src[p] * 256) + src[p + 1]) / 257);                                
-                                WritePixel(pixelFormat, aux, dstPost);
-                                break;
-                            case System.Drawing.Imaging.PixelFormat.Format24bppRgb:
-                            case System.Drawing.Imaging.PixelFormat.Format32bppRgb:
-                                if(p == 0)
-                                    WritePixel(pixelFormat, 255 << 24 | ((*(int*)(src + p) >> 8) & 0xFFFFFF), dstPost);
-                                else
-                                    WritePixel(pixelFormat, 255 << 24 | (*(int*)(src + p - 1) & 0xFFFFFF), dstPost);
-                                break;
-                            case System.Drawing.Imaging.PixelFormat.Format8bppIndexed:
-                                aux = src[p];
-                                WritePixel(pixelFormat, pallet[aux].ToArgb(), dstPost);
-                                break;
-
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                if(bitmap != null)
-                    bitmap.UnlockBits(bmpData);
-            }
-        }
-
-        private static unsafe void WritePixel(GL.PixelFormat pixelFormat, in int color, byte* data)
-        {
-            if (BitConverter.IsLittleEndian)
-            {
-                switch (pixelFormat)
-                {
-                    case GL.PixelFormat.Rgba:
-                        *(int*)data = (color & (0xFF << 24)) | ((color << 8) & 0xFF0000) | ((color >> 8) & 0xFF00) | (color & 0xFF);
-                        break;
-                    case GL.PixelFormat.Rgb:
-                        *(int*)data |= ((color << 8) & 0xFF0000) | ((color >> 8) & 0xFF00) | (color & 0xFF);
-                        break;
-                    case GL.PixelFormat.Red:
-                        *data = (byte)(color & 265);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(pixelFormat));
-                }
-            }
-            else
-                throw new NotImplementedException();
         }
 
         private static int GetPixelSize(GL.PixelFormat pixelFormat)
